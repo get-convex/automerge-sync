@@ -38,6 +38,10 @@ export class AutomergeSync {
     });
     return { doc, heads, isCurrent: changes.isDone };
   }
+  async latestSnapshot(ctx: RunQueryCtx, documentId: DocumentId) {
+    return ctx.runQuery(this.component.lib.latestSnapshot, { documentId });
+  }
+
   async delete(ctx: RunQueryCtx & RunMutationCtx, documentId: DocumentId) {
     await ctx.runMutation(this.component.lib.deleteDoc, { documentId });
   }

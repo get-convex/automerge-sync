@@ -114,3 +114,18 @@ export const deleteDoc = mutation({
     }
   },
 });
+
+export const latestSnapshot = query({
+  args: { documentId: vDocumentId },
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query("changes")
+      .withIndex("by_type_key", (q) =>
+        q.eq("documentId", args.documentId).eq("type", "snapshot")
+      )
+      .filter((q) => q.field("contents"))
+      .order("desc")
+      .first();
+    return result?.contents;
+  },
+});

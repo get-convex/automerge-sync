@@ -50,6 +50,12 @@ export type Mounts = {
       { cursor?: string; documentId: string },
       any
     >;
+    latestSnapshot: FunctionReference<
+      "query",
+      "public",
+      { documentId: string },
+      any
+    >;
     pull: FunctionReference<
       "query",
       "public",
