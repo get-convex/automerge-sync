@@ -1,8 +1,7 @@
 import type { DocumentId } from "@automerge/automerge-repo";
 import { defineTable, defineSchema } from "convex/server";
-import { v, VString } from "convex/values";
-
-export const vDocumentId = v.string() as VString<DocumentId>;
+import { v } from "convex/values";
+import { vDataType, vDocumentId } from "../shared";
 
 export default defineSchema({
   automerge: defineTable({

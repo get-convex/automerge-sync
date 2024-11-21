@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { internalQuery, mutation, query } from "./_generated/server";
-import { vDocumentId } from "./schema";
+import { vDocumentId } from "../shared";
 import { hash as sha256 } from "fast-sha256";
 
 export const submitSnapshot = mutation({
