@@ -1,87 +1,77 @@
 import { v } from "convex/values";
-import { internalQuery, mutation, query } from "./_generated/server";
-import { vDocumentId } from "../shared";
-import { hash as sha256 } from "fast-sha256";
+import { mutation, query } from "./_generated/server";
+import { vDataType, vDocumentId, vLogLevel } from "../shared";
+import { api } from "./_generated/api";
 
-export const submitSnapshot = mutation({
+// TODO: set up logger
+
+export const push = mutation({
   args: {
     documentId: vDocumentId,
     data: v.bytes(),
-    debugDump: v.optional(v.any()),
+    type: vDataType,
+    heads: v.array(v.string()),
+    contents: v.optional(v.any()),
+    logLevel: v.optional(vLogLevel),
+    replaces: v.optional(v.array(v.id("changes"))),
   },
   handler: async (ctx, args) => {
-    const hash = keyHash(new Uint8Array(args.data));
     const existing = await ctx.db
-      .query("automerge")
-      .withIndex("doc_type_hash", (q) =>
+      .query("changes")
+      .withIndex("by_type_key", (q) =>
         q
           .eq("documentId", args.documentId)
-          .eq("type", "snapshot")
-          .eq("hash", hash)
+          .eq("type", args.type)
+          .eq("heads", args.heads)
       )
       .first();
-    if (!existing) {
-      return ctx.db.insert("automerge", {
+    const id =
+      existing?._id ??
+      ctx.db.insert("changes", {
         documentId: args.documentId,
+        type: args.type,
+        heads: args.heads,
         data: args.data,
-        hash,
-        type: "snapshot",
-        debugDump: args.debugDump,
+        contents: args.contents,
       });
+    if (args.replaces) {
+      await Promise.all(
+        args.replaces.map(async (id) => {
+          const exists = await ctx.db.get(id);
+          if (exists) {
+            await ctx.db.delete(id);
+          }
+        })
+      );
     }
-    return existing._id;
-  },
-});
-
-export const submitChange = mutation({
-  args: {
-    documentId: vDocumentId,
-    change: v.bytes(),
-    debugDump: v.optional(v.any()),
-  },
-  handler: async (ctx, args) => {
-    const hash = keyHash(new Uint8Array(args.change));
-    const existing = await ctx.db
-      .query("automerge")
-      .withIndex("doc_type_hash", (q) =>
-        q
-          .eq("documentId", args.documentId)
-          .eq("type", "incremental")
-          .eq("hash", hash)
-      )
-      .first();
-    if (!existing) {
-      return ctx.db.insert("automerge", {
-        documentId: args.documentId,
-        data: args.change,
-        hash,
-        type: "incremental",
-        debugDump: args.debugDump,
-      });
-    }
-    return existing._id;
+    return id;
   },
 });
 
 const MINUTE = 60 * 1000;
 const RETENTION_BUFFER = 5 * MINUTE;
 
-export const pullChanges = query({
+export const pull = query({
   args: {
     documentId: vDocumentId,
     since: v.number(),
+    until: v.optional(v.number()),
+    cursor: v.union(v.string(), v.null()),
     numItems: v.optional(v.number()),
-    cursor: v.optional(v.string()),
+    logLevel: v.optional(vLogLevel),
   },
   handler: async (ctx, args) => {
     const result = await ctx.db
-      .query("automerge")
-      .withIndex("documentId", (q) =>
-        q.eq("documentId", args.documentId).gt("_creationTime", args.since)
-      )
+      .query("changes")
+      .withIndex("by_insertion", (q) => {
+        const qq = q
+          .eq("documentId", args.documentId)
+          .gt("_creationTime", args.since);
+        return args.until ? qq.lte("_creationTime", args.until) : qq;
+      })
       .paginate({
         numItems: args.numItems ?? 10,
-        cursor: args.cursor ?? null,
+        cursor: args.cursor,
       });
 
     // For the first page, also reach further back to avoid missing changes
@@ -90,8 +80,8 @@ export const pullChanges = query({
     // stay consistent if they're based on Date.now().
     if (!args.cursor) {
       const retentionBuffer = await ctx.db
-        .query("automerge")
-        .withIndex("documentId", (q) =>
+        .query("changes")
+        .withIndex("by_insertion", (q) =>
           q
             .eq("documentId", args.documentId)
             .gt("_creationTime", args.since - RETENTION_BUFFER)
@@ -104,26 +94,23 @@ export const pullChanges = query({
   },
 });
 
-export const getChanges = internalQuery({
-  args: { documentId: vDocumentId },
+export const deleteDoc = mutation({
+  args: { documentId: vDocumentId, cursor: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query("automerge")
-      .withIndex("doc_type_hash", (q) => q.eq("documentId", args.documentId))
-      .collect();
+    const result = await ctx.db
+      .query("changes")
+      .withIndex("by_insertion", (q) => q.eq("documentId", args.documentId))
+      .paginate({
+        numItems: 1000,
+        cursor: args.cursor ?? null,
+      });
+    await Promise.all(result.page.map((c) => ctx.db.delete(c._id)));
+    if (!result.isDone) {
+      // TODO: logging
+      await ctx.scheduler.runAfter(0, api.lib.deleteDoc, {
+        documentId: args.documentId,
+        cursor: result.continueCursor,
+      });
+    }
   },
 });
-
-/**
- * Hash functions
- */
-
-// Based on https://github.com/automerge/automerge-repo/blob/fixes/packages/automerge-repo/src/storage/keyHash.ts
-function keyHash(binary: Uint8Array) {
-  // calculate hash
-  const hash = sha256(binary);
-  // To hex string
-  return Array.from(hash, (byte) => byte.toString(16).padStart(2, "0")).join(
-    ""
-  );
-}

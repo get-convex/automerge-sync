@@ -1,5 +1,3 @@
-/* prettier-ignore-start */
-
 /* eslint-disable */
 /**
  * Generated `api` utility.
@@ -41,16 +39,54 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   automergeSync: {
+    automerge: {
+      load: FunctionReference<
+        "query",
+        "internal",
+        {
+          changes: Array<{
+            _id: string;
+            data: ArrayBuffer;
+            heads: Array<string>;
+          }>;
+        },
+        any
+      >;
+    };
     lib: {
-      add: FunctionReference<
+      deleteDoc: FunctionReference<
         "mutation",
         "internal",
-        { count: number; name: string; shards?: number },
-        null
+        { cursor?: string; documentId: string },
+        any
       >;
-      count: FunctionReference<"query", "internal", { name: string }, number>;
+      pull: FunctionReference<
+        "query",
+        "internal",
+        {
+          cursor: string | null;
+          documentId: string;
+          logLevel?: "error" | "warn" | "info" | "debug" | "trace";
+          numItems?: number;
+          since: number;
+          until?: number;
+        },
+        any
+      >;
+      push: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          contents?: any;
+          data: ArrayBuffer;
+          documentId: string;
+          heads: Array<string>;
+          logLevel?: "error" | "warn" | "info" | "debug" | "trace";
+          replaces?: Array<string>;
+          type: "incremental" | "snapshot";
+        },
+        any
+      >;
     };
   };
 };
-
-/* prettier-ignore-end */

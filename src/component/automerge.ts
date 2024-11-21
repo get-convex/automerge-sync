@@ -34,10 +34,16 @@ export const load = query({
     const missing = args.changes
       .filter((c) => A.getMissingDeps(doc, c.heads).length > 0)
       .map((c) => c._id);
+    const data = A.save(doc);
     return {
       doc,
       heads,
       missing,
+      data: toArrayBuffer(data),
     };
   },
 });
+
+function toArrayBuffer(data: Uint8Array): ArrayBuffer {
+  return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+}
