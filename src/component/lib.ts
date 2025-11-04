@@ -1,7 +1,8 @@
-import { v } from "convex/values";
+import { v, Validator, Value } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { vDataType, vDocumentId, vLogLevel } from "../shared";
 import { api } from "./_generated/api";
+import schema from "./schema";
 
 // TODO: set up logger
 
@@ -15,6 +16,7 @@ export const push = mutation({
     logLevel: v.optional(vLogLevel),
     replaces: v.optional(v.array(v.id("changes"))),
   },
+  returns: v.id("changes"),
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("changes")
@@ -51,6 +53,30 @@ export const push = mutation({
 const MINUTE = 60 * 1000;
 const RETENTION_BUFFER = 5 * MINUTE;
 
+export function vPaginationResult<
+  T extends Validator<Value, "required", string>,
+>(itemValidator: T) {
+  return v.object({
+    page: v.array(itemValidator),
+    continueCursor: v.string(),
+    isDone: v.boolean(),
+    splitCursor: v.optional(v.union(v.string(), v.null())),
+    pageStatus: v.optional(
+      v.union(
+        v.literal("SplitRecommended"),
+        v.literal("SplitRequired"),
+        v.null()
+      )
+    ),
+  });
+}
+
+const vChange = v.object({
+  ...schema.tables.changes.validator.fields,
+  _id: v.id("changes"),
+  _creationTime: v.number(),
+});
+
 export const pull = query({
   args: {
     documentId: vDocumentId,
@@ -60,6 +86,7 @@ export const pull = query({
     numItems: v.optional(v.number()),
     logLevel: v.optional(vLogLevel),
   },
+  returns: vPaginationResult(vChange),
   handler: async (ctx, args) => {
     const result = await ctx.db
       .query("changes")
@@ -96,6 +123,7 @@ export const pull = query({
 
 export const deleteDoc = mutation({
   args: { documentId: vDocumentId, cursor: v.optional(v.string()) },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const result = await ctx.db
       .query("changes")
@@ -117,6 +145,7 @@ export const deleteDoc = mutation({
 
 export const latestSnapshot = query({
   args: { documentId: vDocumentId },
+  returns: v.any(),
   handler: async (ctx, args) => {
     const result = await ctx.db
       .query("changes")

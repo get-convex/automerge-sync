@@ -8,15 +8,15 @@ import {
   queryGeneric,
 } from "convex/server";
 import { ConvexError, GenericId, Infer, v } from "convex/values";
-import { api } from "../component/_generated/api";
 import { DocumentId } from "@automerge/automerge-repo";
 import { vDataType, vDocumentId, vLogLevel } from "../shared";
+import { ComponentApi } from "../component/_generated/component";
 
 export const PERMISSION_ERROR = "permission_denied" as const;
 
 export class AutomergeSync {
   constructor(
-    public component: UseApi<typeof api>,
+    public component: ComponentApi,
     private opts?: {
       // TODO: allow overriding snapshot function
       logLevel?: "error" | "warn" | "info" | "debug" | "trace";
@@ -213,31 +213,3 @@ type RunQueryCtx = {
 type RunMutationCtx = {
   runMutation: GenericMutationCtx<GenericDataModel>["runMutation"];
 };
-
-export type OpaqueIds<T> = T extends GenericId<infer _T> | string
-  ? string
-  : T extends (infer U)[]
-    ? OpaqueIds<U>[]
-    : T extends ArrayBuffer
-      ? ArrayBuffer
-      : T extends object
-        ? { [K in keyof T]: OpaqueIds<T[K]> }
-        : T;
-
-export type UseApi<API> = Expand<{
-  [mod in keyof API]: API[mod] extends FunctionReference<
-    infer FType,
-    "public",
-    infer FArgs,
-    infer FReturnType,
-    infer FComponentPath
-  >
-    ? FunctionReference<
-        FType,
-        "internal",
-        OpaqueIds<FArgs>,
-        OpaqueIds<FReturnType>,
-        FComponentPath
-      >
-    : UseApi<API[mod]>;
-}>;

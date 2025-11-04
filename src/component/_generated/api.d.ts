@@ -16,6 +16,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+
 /**
  * A utility for referencing Convex functions in your app's API.
  *
@@ -28,74 +29,13 @@ declare const fullApi: ApiFromModules<{
   automerge: typeof automerge;
   lib: typeof lib;
 }>;
-export type Mounts = {
-  automerge: {
-    load: FunctionReference<
-      "query",
-      "public",
-      {
-        changes: Array<{
-          _id: string;
-          data: ArrayBuffer;
-          heads: Array<string>;
-        }>;
-      },
-      any
-    >;
-  };
-  lib: {
-    deleteDoc: FunctionReference<
-      "mutation",
-      "public",
-      { cursor?: string; documentId: string },
-      any
-    >;
-    latestSnapshot: FunctionReference<
-      "query",
-      "public",
-      { documentId: string },
-      any
-    >;
-    pull: FunctionReference<
-      "query",
-      "public",
-      {
-        cursor: string | null;
-        documentId: string;
-        logLevel?: "error" | "warn" | "info" | "debug" | "trace";
-        numItems?: number;
-        since: number;
-        until?: number;
-      },
-      any
-    >;
-    push: FunctionReference<
-      "mutation",
-      "public",
-      {
-        contents?: any;
-        data: ArrayBuffer;
-        documentId: string;
-        heads: Array<string>;
-        logLevel?: "error" | "warn" | "info" | "debug" | "trace";
-        replaces?: Array<string>;
-        type: "incremental" | "snapshot";
-      },
-      any
-    >;
-  };
-};
-// For now fullApiWithMounts is only fullApi which provides
-// jump-to-definition in component client code.
-// Use Mounts for the same type without the inference.
-declare const fullApiWithMounts: typeof fullApi;
 
 export declare const api: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "public">
 >;
 export declare const internal: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "internal">
 >;
 

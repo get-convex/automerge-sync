@@ -24,6 +24,12 @@ export const load = query({
       })
     ),
   },
+  returns: v.object({
+    doc: v.record(v.string(), v.any()),
+    heads: v.array(v.string()),
+    missing: v.array(v.id("changes")),
+    data: v.bytes(),
+  }),
   handler: async (ctx, args) => {
     const A = await loadWasm();
     const doc = A.loadIncremental(
@@ -45,5 +51,8 @@ export const load = query({
 });
 
 function toArrayBuffer(data: Uint8Array): ArrayBuffer {
-  return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+  return data.buffer.slice(
+    data.byteOffset,
+    data.byteOffset + data.byteLength
+  ) as ArrayBuffer;
 }
