@@ -24,7 +24,7 @@ export const push = mutation({
         q
           .eq("documentId", args.documentId)
           .eq("type", args.type)
-          .eq("heads", args.heads)
+          .eq("heads", args.heads),
       )
       .first();
     const id =
@@ -43,7 +43,7 @@ export const push = mutation({
           if (exists) {
             await ctx.db.delete(id);
           }
-        })
+        }),
       );
     }
     return id;
@@ -65,8 +65,8 @@ export function vPaginationResult<
       v.union(
         v.literal("SplitRecommended"),
         v.literal("SplitRequired"),
-        v.null()
-      )
+        v.null(),
+      ),
     ),
   });
 }
@@ -112,7 +112,7 @@ export const pull = query({
           q
             .eq("documentId", args.documentId)
             .gt("_creationTime", args.since - RETENTION_BUFFER)
-            .lte("_creationTime", args.since)
+            .lte("_creationTime", args.since),
         )
         .collect();
       result.page = retentionBuffer.concat(result.page);
@@ -150,7 +150,7 @@ export const latestSnapshot = query({
     const result = await ctx.db
       .query("changes")
       .withIndex("by_type_key", (q) =>
-        q.eq("documentId", args.documentId).eq("type", "snapshot")
+        q.eq("documentId", args.documentId).eq("type", "snapshot"),
       )
       .filter((q) => q.field("contents"))
       .order("desc")

@@ -21,7 +21,7 @@ export const load = query({
         _id: v.id("changes"),
         data: v.bytes(),
         heads: v.array(v.string()),
-      })
+      }),
     ),
   },
   returns: v.object({
@@ -34,7 +34,7 @@ export const load = query({
     const A = await loadWasm();
     const doc = A.loadIncremental(
       A.init(),
-      mergeArrays(args.changes.map((c) => new Uint8Array(c.data)))
+      mergeArrays(args.changes.map((c) => new Uint8Array(c.data))),
     );
     const heads = A.getHeads(doc);
     const missing = args.changes
@@ -53,6 +53,6 @@ export const load = query({
 function toArrayBuffer(data: Uint8Array): ArrayBuffer {
   return data.buffer.slice(
     data.byteOffset,
-    data.byteOffset + data.byteLength
+    data.byteOffset + data.byteLength,
   ) as ArrayBuffer;
 }

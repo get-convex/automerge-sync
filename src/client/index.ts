@@ -18,7 +18,7 @@ export class AutomergeSync {
     private opts?: {
       // TODO: allow overriding snapshot function
       logLevel?: "error" | "warn" | "info" | "debug" | "trace";
-    }
+    },
   ) {}
   async load(ctx: RunQueryCtx, documentId: DocumentId) {
     const changes = await this.pull(ctx, {
@@ -76,7 +76,7 @@ export class AutomergeSync {
   });
   async compact(
     ctx: RunQueryCtx & RunMutationCtx,
-    args: Infer<typeof this.compactArgs>
+    args: Infer<typeof this.compactArgs>,
   ) {
     const changes = await this.pull(ctx, {
       documentId: args.documentId,
@@ -100,7 +100,7 @@ export class AutomergeSync {
           data: c.data,
           heads: c.heads,
         })),
-      }
+      },
     );
     const missingIds = new Set(missing);
     if (missingIds.size > 0) {
@@ -137,17 +137,17 @@ export class AutomergeSync {
   syncApi<T, DataModel extends GenericDataModel>(callbacks?: {
     canRead: (
       ctx: GenericQueryCtx<DataModel>,
-      documentId: DocumentId
+      documentId: DocumentId,
     ) => boolean | Promise<boolean>;
     canChange: (
       ctx: GenericMutationCtx<DataModel>,
-      documentId: DocumentId
+      documentId: DocumentId,
     ) => boolean | Promise<boolean>;
     onSnapshot?: (
       ctx: GenericMutationCtx<DataModel>,
       documentId: DocumentId,
       doc: T,
-      isCurrent: boolean
+      isCurrent: boolean,
     ) => void | Promise<void>;
   }) {
     return {
