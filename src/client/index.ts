@@ -1,16 +1,14 @@
 import {
-  Expand,
-  FunctionReference,
-  GenericDataModel,
-  GenericMutationCtx,
-  GenericQueryCtx,
+  type GenericDataModel,
+  type GenericMutationCtx,
+  type GenericQueryCtx,
   mutationGeneric,
   queryGeneric,
 } from "convex/server";
-import { ConvexError, GenericId, Infer, v } from "convex/values";
-import { DocumentId } from "@automerge/automerge-repo";
+import { ConvexError, type Infer, v } from "convex/values";
+import type { DocumentId } from "@automerge/automerge-repo";
 import { vDataType, vDocumentId, vLogLevel } from "../shared";
-import { ComponentApi } from "../component/_generated/component";
+import type { ComponentApi } from "../component/_generated/component";
 
 export const PERMISSION_ERROR = "permission_denied" as const;
 

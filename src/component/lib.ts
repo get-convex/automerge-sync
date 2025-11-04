@@ -1,4 +1,4 @@
-import { v, Validator, Value } from "convex/values";
+import { v, type Validator, type Value } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { vDataType, vDocumentId, vLogLevel } from "../shared";
 import { api } from "./_generated/api";

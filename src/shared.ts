@@ -1,5 +1,5 @@
 import type { DocumentId } from "@automerge/automerge-repo";
-import { v, VString } from "convex/values";
+import { v, type VString } from "convex/values";
 
 export const vDocumentId = v.string() as VString<DocumentId>;
 export const vDataType = v.union(

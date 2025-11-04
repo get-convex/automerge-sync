@@ -27,13 +27,14 @@ import type {
 declare const fullApi: ApiFromModules<{
   example: typeof example;
 }>;
+declare const fullApiWithMounts: typeof fullApi;
 
 export declare const api: FilterApi<
-  typeof fullApi,
+  typeof fullApiWithMounts,
   FunctionReference<any, "public">
 >;
 export declare const internal: FilterApi<
-  typeof fullApi,
+  typeof fullApiWithMounts,
   FunctionReference<any, "internal">
 >;
 
