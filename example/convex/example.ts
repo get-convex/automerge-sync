@@ -1,4 +1,3 @@
-import { internalMutation, query, mutation } from "./_generated/server";
 import { components } from "./_generated/api";
 import { AutomergeSync } from "@convex-dev/automerge-sync";
 
