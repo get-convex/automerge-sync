@@ -1,8 +1,8 @@
 import { v, type Validator, type Value } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import { vDataType, vDocumentId, vLogLevel } from "../shared";
-import { api } from "./_generated/api";
-import schema from "./schema";
+import { mutation, query } from "./_generated/server.js";
+import { vDataType, vDocumentId, vLogLevel } from "../shared.js";
+import { api } from "./_generated/api.js";
+import schema from "./schema.js";
 
 // TODO: set up logger
 
