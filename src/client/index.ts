@@ -7,8 +7,8 @@ import {
 } from "convex/server";
 import { ConvexError, type Infer, v } from "convex/values";
 import type { DocumentId } from "@automerge/automerge-repo";
-import { vDataType, vDocumentId, vLogLevel } from "../shared";
-import type { ComponentApi } from "../component/_generated/component";
+import { vDataType, vDocumentId, vLogLevel } from "../shared.js";
+import type { ComponentApi } from "../component/_generated/component.js";
 
 export const PERMISSION_ERROR = "permission_denied" as const;
 

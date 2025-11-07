@@ -1,7 +1,7 @@
 import * as Automerge from "@automerge/automerge/slim/next";
 // @ts-expect-error wasm is not a module
 import { automergeWasmBase64 } from "@automerge/automerge/automerge.wasm.base64.js";
-import { query } from "./_generated/server";
+import { query } from "./_generated/server.js";
 import { v } from "convex/values";
 import { mergeArrays } from "@automerge/automerge-repo/helpers/mergeArrays.js";
 

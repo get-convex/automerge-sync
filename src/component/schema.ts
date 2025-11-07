@@ -1,6 +1,6 @@
 import { defineTable, defineSchema } from "convex/server";
 import { v } from "convex/values";
-import { vDataType, vDocumentId } from "../shared";
+import { vDataType, vDocumentId } from "../shared.js";
 
 export default defineSchema({
   changes: defineTable({
