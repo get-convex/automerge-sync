@@ -36,7 +36,7 @@ component by calling `use`:
 ```ts
 // convex/convex.config.ts
 import { defineApp } from "convex/server";
-import automergeSync from "@convex-dev/automerge-sync/convex.config";
+import automergeSync from "@convex-dev/automerge-sync/convex.config.js";
 
 const app = defineApp();
 app.use(automergeSync);
