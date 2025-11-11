@@ -8,17 +8,20 @@
  * @module
  */
 
-import type * as example from "../example.js";
+import type * as automerge from "../automerge.js";
+import type * as lib from "../lib.js";
 
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import { anyApi, componentsGeneric } from "convex/server";
 
-declare const fullApi: ApiFromModules<{
-  example: typeof example;
-}>;
+const fullApi: ApiFromModules<{
+  automerge: typeof automerge;
+  lib: typeof lib;
+}> = anyApi as any;
 
 /**
  * A utility for referencing Convex functions in your app's public API.
@@ -28,10 +31,10 @@ declare const fullApi: ApiFromModules<{
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-export declare const api: FilterApi<
+export const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
->;
+> = anyApi as any;
 
 /**
  * A utility for referencing Convex functions in your app's internal API.
@@ -41,11 +44,9 @@ export declare const api: FilterApi<
  * const myFunctionReference = internal.myModule.myFunction;
  * ```
  */
-export declare const internal: FilterApi<
+export const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
->;
+> = anyApi as any;
 
-export declare const components: {
-  automergeSync: import("@convex-dev/automerge-sync/_generated/component.js").ComponentApi<"automergeSync">;
-};
+export const components = componentsGeneric() as unknown as {};
