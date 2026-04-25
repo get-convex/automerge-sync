@@ -39,9 +39,9 @@ export const push = mutation({
     if (args.replaces) {
       await Promise.all(
         args.replaces.map(async (id) => {
-          const exists = await ctx.db.get(id);
+          const exists = await ctx.db.get("changes", id);
           if (exists) {
-            await ctx.db.delete(id);
+            await ctx.db.delete("changes", id);
           }
         }),
       );
@@ -132,7 +132,7 @@ export const deleteDoc = mutation({
         numItems: 1000,
         cursor: args.cursor ?? null,
       });
-    await Promise.all(result.page.map((c) => ctx.db.delete(c._id)));
+    await Promise.all(result.page.map((c) => ctx.db.delete("changes", c._id)));
     if (!result.isDone) {
       // TODO: logging
       await ctx.scheduler.runAfter(0, api.lib.deleteDoc, {
