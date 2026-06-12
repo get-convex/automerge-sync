@@ -1,4 +1,5 @@
 import {
+  type GenericActionCtx,
   type GenericDataModel,
   type GenericMutationCtx,
   type GenericQueryCtx,
@@ -20,7 +21,7 @@ export class AutomergeSync {
       logLevel?: "error" | "warn" | "info" | "debug" | "trace";
     },
   ) {}
-  async load(ctx: RunQueryCtx, documentId: DocumentId) {
+  async load(ctx: QueryCtx | MutationCtx | ActionCtx, documentId: DocumentId) {
     const changes = await this.pull(ctx, {
       documentId: documentId,
       since: 0,
@@ -36,11 +37,14 @@ export class AutomergeSync {
     });
     return { doc, heads, isCurrent: changes.isDone };
   }
-  async latestSnapshot(ctx: RunQueryCtx, documentId: DocumentId) {
+  async latestSnapshot(
+    ctx: QueryCtx | MutationCtx | ActionCtx,
+    documentId: DocumentId,
+  ) {
     return ctx.runQuery(this.component.lib.latestSnapshot, { documentId });
   }
 
-  async delete(ctx: RunQueryCtx & RunMutationCtx, documentId: DocumentId) {
+  async delete(ctx: MutationCtx | ActionCtx, documentId: DocumentId) {
     await ctx.runMutation(this.component.lib.deleteDoc, { documentId });
   }
 
@@ -52,7 +56,10 @@ export class AutomergeSync {
     numItems: v.optional(v.number()),
     logLevel: v.optional(vLogLevel),
   });
-  async pull(ctx: RunQueryCtx, args: Infer<typeof this.pullArgs>) {
+  async pull(
+    ctx: QueryCtx | MutationCtx | ActionCtx,
+    args: Infer<typeof this.pullArgs>,
+  ) {
     return ctx.runQuery(this.component.lib.pull, args);
   }
 
@@ -65,7 +72,7 @@ export class AutomergeSync {
     logLevel: v.optional(vLogLevel),
     replaces: v.optional(v.array(v.string())),
   });
-  async push(ctx: RunMutationCtx, args: Infer<typeof this.pushArgs>) {
+  async push(ctx: MutationCtx | ActionCtx, args: Infer<typeof this.pushArgs>) {
     return ctx.runMutation(this.component.lib.push, args);
   }
 
@@ -75,7 +82,7 @@ export class AutomergeSync {
     until: v.number(),
   });
   async compact(
-    ctx: RunQueryCtx & RunMutationCtx,
+    ctx: MutationCtx | ActionCtx,
     args: Infer<typeof this.compactArgs>,
   ) {
     const changes = await this.pull(ctx, {
@@ -205,9 +212,12 @@ export class AutomergeSync {
 
 /* Type utils follow */
 
-type RunQueryCtx = {
-  runQuery: GenericQueryCtx<GenericDataModel>["runQuery"];
-};
-type RunMutationCtx = {
-  runMutation: GenericMutationCtx<GenericDataModel>["runMutation"];
-};
+type QueryCtx = Pick<GenericQueryCtx<GenericDataModel>, "runQuery">;
+type MutationCtx = Pick<
+  GenericMutationCtx<GenericDataModel>,
+  "runQuery" | "runMutation"
+>;
+type ActionCtx = Pick<
+  GenericActionCtx<GenericDataModel>,
+  "runQuery" | "runMutation" | "runAction"
+>;
