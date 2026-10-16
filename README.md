@@ -11,7 +11,7 @@
 - [ ] Links to Stack / other resources?
 
 Found a bug? Feature request?
-[File it here](https://github.com/get-convex/automerge-sync/issues).
+[File it here](https://github.com/convex/automerge-sync/issues).
 
 ## Pre-requisite: Convex
 
