@@ -1,11 +1,11 @@
 {
   "name": "@convex-dev/automerge-sync",
   "description": "Sync Automerge documents with Convex.",
-  "repository": "github:get-convex/automerge-sync",
-  "homepage": "https://github.com/get-convex/automerge-sync#readme",
+  "repository": "github:convex/automerge-sync",
+  "homepage": "https://github.com/convex/automerge-sync#readme",
   "bugs": {
     "email": "support@convex.dev",
-    "url": "https://github.com/get-convex/automerge-sync/issues"
+    "url": "https://github.com/convex/automerge-sync/issues"
   },
   "version": "0.2.2",
   "license": "Apache-2.0",
